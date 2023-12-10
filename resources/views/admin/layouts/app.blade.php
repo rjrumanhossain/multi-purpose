@@ -5,12 +5,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Starter</title>
+    <title>Admin</title>
 
 
-    {{--  <link rel="stylesheet" href="">  --}}
-
-    {{--  <link rel="stylesheet" href="dist/css/adminlte.min.css?v=3.2.0">  --}}
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -30,6 +27,8 @@
             <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights
             reserved.
         </footer>
+
+
     </div>
 
 
