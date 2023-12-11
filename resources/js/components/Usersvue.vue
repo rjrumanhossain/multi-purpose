@@ -1,3 +1,5 @@
+
+
 <template>
   <div class="content-header">
     <div class="container-fluid">
@@ -102,37 +104,44 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <form >
-              <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" v-model="form.name" placeholder="Name">
-              </div>
-              <div class="form-group">
-                <label for="name">E-mail</label>
-                <input type="text" class="form-control" v-model="form.email" placeholder="example@gmail.com">
-              </div>
-              <div class="form-group">
-                <label for="name">Password</label>
-                <input type="text" class="form-control" v-model="form.password" placeholder="password">
-              </div>
-          </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-          <button type="button" @click="createUser()" class="btn btn-primary">Save changes</button>
-        </div>
+        <Form @submit="createUser()" :validation-schema="schema" v-slot="{errors}">
+          <div class="modal-body">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <Field type="text" class="form-control" v-model="form.name" :class="{'is-invalid':errors.name}" id="name" name="name" placeholder="Name"/>
+                  <span class="text-red">{{ errors.name }}</span>
+                </div>
+                <div class="form-group">
+                  <label for="email">E-mail</label>
+                  <Field type="text" class="form-control" v-model="form.email" :class="{'is-invalid':errors.email}" id="email"  name="email" placeholder="example@gmail.com"/>
+                  <span class="text-red">{{ errors.email }}</span>
+
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <Field type="text" class="form-control" v-model="form.password" :class="{'is-invalid':errors.password}" id="password" name="password" placeholder="password"/>
+                  <span class="text-red">{{ errors.password }}</span>
+
+                </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </Form>
       </div>
     </div>
   </div>
 </template>
 
+
 <script scope>
 import axios from "axios";
 import { ref, onMounted } from "vue";
-
+import { Field, Form } from 'vee-validate';
+import * as yup from 'yup';
 export default {
   setup() {
     const users = ref([]);
@@ -140,8 +149,18 @@ export default {
           name:'',
           email:'',
           password:'',
+      };
+     const schema = yup.object({
+        name: yup.string().required(),
+        password: yup.string().required().min(8),
+        email: yup.string().email().required()
+     });
 
-      }
+
+
+      // const createUser = () =>{
+      //   console.log(form.name);
+      // }
 
     const getUsers = () => {
       axios.get("http://127.0.0.1:8000/api/admin/users")
@@ -153,11 +172,15 @@ export default {
         });
     };
 
-    const createUser = () => {
+    const createUser = ({resetForm}) => {
       axios.post('http://127.0.0.1:8000/api/create/users', form)
         .then((response) => {
             users.value.push(response.data);
             $("#createUsers").modal('hide');
+            form.name = '';
+            form.email = '';
+            form.password = '';
+
         })
         .catch((error) => {
           console.log(error);
@@ -173,25 +196,12 @@ export default {
       users,
       form,
       createUser,
+      schema
     };
   },
-    // methods:{
-    //     createUser(){
-
-    //       axios.post('http://127.0.0.1:8000/api/create/users', this.form)
-    //       .then((response) => {
-    //         const newUser = response.data;
-    //         this.users.push(newUser);
-    //         this.users.push(newUser)
-    //         console.log(this.users)
-    //             $("#createUsers").modal('hide');
-
-
-    //       })
-    //       .catch((error) =>{
-    //         console.log(error)
-    //       });
-    //     }
-    // }
+  components: {
+    Field,
+    Form,
+  },
 };
 </script>
